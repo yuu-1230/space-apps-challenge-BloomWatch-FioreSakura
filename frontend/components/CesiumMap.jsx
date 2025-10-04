@@ -1,65 +1,59 @@
 "use client";
 
-import React, { useRef } from "react";
-import { Viewer, ScreenSpaceEventHandler, ScreenSpaceEvent } from "resium";
-import {
-  Ion as CesiumIon,
-  Cartesian3,
-  Math as CesiumMath,
-  Cartographic,
-  SceneMode,
-} from "cesium";
-
-// .env.localファイルからCesium Ionのアクセストークンを読み込む
-CesiumIon.defaultAccessToken = process.env.NEXT_PUBLIC_CESIUM_ION_TOKEN;
+import React, { useRef, useEffect } from "react";
 
 export default function CesiumMap({ onMapClick }) {
-  // CesiumのViewerインスタンスにアクセスするための参照(ref)を作成
+  const cesiumContainer = useRef(null);
+  // viewerインスタンスをコンポーネントのライフサイクルで管理するためのref
   const viewerRef = useRef(null);
 
-  /**
-   * 地図が左クリックされたときの処理
-   */
-  const handleLeftClick = (movement) => {
-    // Viewerインスタンスがなければ処理を中断
-    if (!viewerRef.current?.cesiumElement) return;
-    const viewer = viewerRef.current.cesiumElement;
+  useEffect(() => {
+    // window.Cesiumが利用可能かチェック
+    if (typeof window !== "undefined" && window.Cesium) {
+      // 既にviewerが初期化されていない場合のみ実行
+      if (cesiumContainer.current && !viewerRef.current) {
+        window.Cesium.Ion.defaultAccessToken =
+          process.env.NEXT_PUBLIC_CESIUM_ION_TOKEN;
 
-    // スクリーン座標(movement.position)から地球上の3D座標(Cartesian3)を取得
-    const cartesian = viewer.scene.pickPosition(movement.position);
+        const viewer = new window.Cesium.Viewer(cesiumContainer.current, {
+          infoBox: false, // クリック時の情報ボックスを非表示に
+          selectionIndicator: false, // クリック時の選択インジケーターを非表示に
+        });
 
-    // 3D座標が取得できた場合のみ処理を続行
-    if (cartesian) {
-      // 3D座標(Cartesian3)を地理座標(Cartographic)に変換
-      const cartographic = Cartographic.fromCartesian(cartesian);
-      // 地理座標(ラジアン)を度数法(一般的な緯度経度)に変換
-      const longitude = CesiumMath.toDegrees(cartographic.longitude);
-      const latitude = CesiumMath.toDegrees(cartographic.latitude);
+        viewerRef.current = viewer; // refにviewerインスタンスを保存
 
-      // 親コンポーネントに緯度経度を渡す
-      onMapClick(latitude, longitude);
+        const handler = new window.Cesium.ScreenSpaceEventHandler(
+          viewer.canvas
+        );
+        handler.setInputAction((movement) => {
+          const cartesian = viewer.camera.pickEllipsoid(movement.position);
+          if (cartesian) {
+            const cartographic =
+              window.Cesium.Cartographic.fromCartesian(cartesian);
+            const longitude = window.Cesium.Math.toDegrees(
+              cartographic.longitude
+            );
+            const latitude = window.Cesium.Math.toDegrees(
+              cartographic.latitude
+            );
+            // 親コンポーネントに緯度経度を通知
+            onMapClick(latitude, longitude);
+          }
+        }, window.Cesium.ScreenSpaceEventType.LEFT_CLICK);
+      }
     }
-  };
+
+    // クリーンアップ関数（コンポーネントがアンマウントされるときに実行）
+    return () => {
+      // 開発モードでの二重描画を防ぐため、viewerを破棄する
+      if (viewerRef.current) {
+        viewerRef.current.destroy();
+        viewerRef.current = null;
+      }
+    };
+  }, [onMapClick]); // onMapClickが変更された場合にもエフェクトを再実行
 
   return (
-    <Viewer
-      full
-      ref={viewerRef}
-      // 初期カメラ位置やオプションを設定
-      sceneMode={SceneMode.SCENE3D}
-      timeline={false}
-      animation={false}
-      baseLayerPicker={false}
-      geocoder={false}
-      homeButton={false}
-      sceneModePicker={false}
-      navigationHelpButton={false}
-    >
-      {/* クリックイベントをハンドリングするためのコンポーネント */}
-      <ScreenSpaceEventHandler>
-        {/* 左クリックイベント(LEFT_CLICK)に、定義した関数を紐付け */}
-        <ScreenSpaceEvent action={handleLeftClick} type={"LEFT_CLICK"} />
-      </ScreenSpaceEventHandler>
-    </Viewer>
+    <div ref={cesiumContainer} style={{ width: "100%", height: "100%" }} />
   );
 }

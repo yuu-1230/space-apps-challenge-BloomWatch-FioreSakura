@@ -1,10 +1,26 @@
-// next-plugin-cesiumをインポート
-import nextPluginCesium from "next-plugin-cesium";
+import CopyWebpackPlugin from "copy-webpack-plugin";
+import path from "path";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ここに他のNext.jsの設定も追加できます
+  webpack: (config) => {
+    config.plugins.push(
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: path.join(
+              path.dirname(require.resolve("cesium/package.json")),
+              "Build/Cesium"
+            ),
+            to: "static/cesium",
+            // ビルドエラーを防ぐための重要なオプション
+            info: { minimized: true },
+          },
+        ],
+      })
+    );
+    return config;
+  },
 };
 
-// 設定をCesiumプラグインでラップしてエクスポートする
-export default nextPluginCesium(nextConfig);
+export default nextConfig;

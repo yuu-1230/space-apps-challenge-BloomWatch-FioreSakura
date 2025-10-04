@@ -1,37 +1,56 @@
 "use client";
 
-import { useState } from "react";
-// 各パーツをコンポーネントとしてインポートします
-import CesiumMap from "@/components/CesiumMap";
+import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import InfoPanel from "@/components/InfoPanel";
 
 export default function Home() {
-  // バックエンドから受け取った予測結果を保存するための状態
   const [predictionData, setPredictionData] = useState(null);
-  // API通信中のローディング状態を管理
   const [isLoading, setIsLoading] = useState(false);
-  // エラーが発生した際の情報を管理
   const [error, setError] = useState(null);
 
+  // CesiumMapコンポーネントを動的に、かつクライアントサイドでのみインポートします。
+  // これにより、サーバーサイドレンダリング時のエラーを回避します。
+  const CesiumMap = useMemo(
+    () =>
+      dynamic(() => import("@/components/CesiumMap"), {
+        ssr: false, // サーバーサイドレンダリングを無効化
+        // 地図が読み込まれるまでの間に表示するローディング画面
+        loading: () => (
+          <div
+            style={{
+              width: "100vw",
+              height: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#002B4D",
+            }}
+          >
+            <p style={{ color: "white", fontSize: "1.5rem" }}>
+              Loading Globe...
+            </p>
+          </div>
+        ),
+      }),
+    []
+  );
+
   /**
-   * 地図コンポーネントからクリックイベントを受け取ったときに実行される関数
+   * 地図がクリックされたときに呼び出される関数
    * @param {number} latitude - クリックされた地点の緯度
    * @param {number} longitude - クリックされた地点の経度
    */
   const handleMapClick = (latitude, longitude) => {
-    console.log(`Map clicked at: Lat ${latitude}, Lon ${longitude}`);
-
-    // 新しい分析を開始する前に、状態をリセット
     setIsLoading(true);
     setPredictionData(null);
     setError(null);
 
-    // バックエンドのAPIに緯度経度を付けてリクエスト
+    // バックエンドの予測APIにリクエストを送信
     fetch(`http://127.0.0.1:8000/api/predict?lat=${latitude}&lon=${longitude}`)
       .then((response) => {
-        // HTTPステータスが200番台でない場合はエラーとして扱う
+        // レスポンスが正常でない場合はエラーを投げる
         if (!response.ok) {
-          // バックエンドからのエラーメッセージを非同期で取得
           return response.json().then((err) => {
             throw new Error(err.detail || "Network response was not ok");
           });
@@ -39,22 +58,17 @@ export default function Home() {
         return response.json();
       })
       .then((data) => {
-        // 受け取ったデータを状態に保存
-        setPredictionData(data);
+        setPredictionData(data); // 成功したらデータをセット
       })
       .catch((err) => {
-        // 通信中または処理中にエラーが発生した場合
-        console.error("Error fetching prediction data:", err);
-        setError(err.message);
+        setError(err.message); // エラーが発生したらエラーメッセージをセット
       })
       .finally(() => {
-        // 成功・失敗に関わらず、ローディング状態を終了
-        setIsLoading(false);
+        setIsLoading(false); // 成功・失敗に関わらずローディングを終了
       });
   };
 
   return (
-    // position: 'relative' を親要素に設定し、子要素の絶対位置指定の基準とする
     <div
       style={{
         position: "relative",
@@ -63,10 +77,9 @@ export default function Home() {
         overflow: "hidden",
       }}
     >
-      {/* 地図コンポーネントにクリック処理用の関数を渡す */}
+      {/* 地図コンポーネントをレンダリングし、クリックイベント用の関数を渡す */}
       <CesiumMap onMapClick={handleMapClick} />
-
-      {/* 情報パネルコンポーネントに表示用のデータを渡す */}
+      {/* 情報パネルコンポーネントに、表示に必要なデータと状態を渡す */}
       <InfoPanel data={predictionData} isLoading={isLoading} error={error} />
     </div>
   );
