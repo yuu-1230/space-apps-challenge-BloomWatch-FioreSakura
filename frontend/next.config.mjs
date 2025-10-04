@@ -1,4 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+// next-plugin-cesiumをインポート
+import nextPluginCesium from "next-plugin-cesium";
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ここに他のNext.jsの設定も追加できます
+};
+
+// 設定をCesiumプラグインでラップしてエクスポートする
+export default nextPluginCesium(nextConfig);
