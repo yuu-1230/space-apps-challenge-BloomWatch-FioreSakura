@@ -91,11 +91,11 @@ cd frontend`
 
    `cd backend
 
-   # 仮想環境を有効化
+   ### 仮想環境を有効化
 
    source venv/bin/activate # or .\venv\Scripts\activate
 
-   # サーバーを起動
+   ### サーバーを起動
 
    uvicorn main:app --reload`
 
@@ -105,7 +105,7 @@ cd frontend`
 
    `cd frontend
 
-   # サーバーを起動
+   ### サーバーを起動
 
    npm run dev`
 
