@@ -22,6 +22,23 @@ export default function CesiumMap({ onMapClick }) {
 
         viewerRef.current = viewer; // refにviewerインスタンスを保存
 
+        // --- ここから東京都中心の赤い円を追加 ---
+        const tokyoLat = 35.6895;
+        const tokyoLon = 139.6917;
+        viewer.entities.add({
+          name: "Tokyo Bloom Prediction",
+          position: window.Cesium.Cartesian3.fromDegrees(tokyoLon, tokyoLat),
+          ellipse: {
+            semiMinorAxis: 20000.0, // 半径20km
+            semiMajorAxis: 20000.0,
+            material: window.Cesium.Color.RED.withAlpha(0.5),
+            outline: true,
+            outlineColor: window.Cesium.Color.RED,
+          },
+          description: "モックデータによる開花予測エリア",
+        });
+        // --- ここまで追加 ---
+
         const handler = new window.Cesium.ScreenSpaceEventHandler(
           viewer.canvas
         );
