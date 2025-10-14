@@ -1,4 +1,4 @@
-# BloomScope - NASA Space Apps Challenge 2025
+# BloomWatch - NASA Space Apps Challenge 2025
 ## Team FioreSakura
 **このリポジトリはNASA Space Apps Challengeの開発途中のコードの一部であり、最終的に提出されたものではありません。**
 
