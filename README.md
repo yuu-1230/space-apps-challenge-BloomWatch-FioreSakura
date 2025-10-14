@@ -17,7 +17,7 @@ Google Earth Engine (GEE) の衛星データを活用し、地球上の植物の
 
 <img width="720" height="378" alt="image" src="https://github.com/user-attachments/assets/97fe6f3e-19b6-49b8-b82f-ecc55168fef2" />
 
-## 🚀 技術スタック
+## 技術スタック
 
 - **フロントエンド:** Next.js, React, Tailwind CSS, Cesium.js (Resium)
 - **バックエンド:** Python, FastAPI
@@ -25,7 +25,7 @@ Google Earth Engine (GEE) の衛星データを活用し、地球上の植物の
 
 ---
 
-## 🛠️ 環境構築
+## 環境構築
 
 このプロジェクトをローカル環境で動かすための手順です。
 
@@ -50,79 +50,97 @@ cd bloomscope`
 
 ### **3. バックエンド (Python/FastAPI)**
 
-1. **`backend`ディレクトリに移動します。**Bash
+1. **backendディレクトリに移動します。**
 
-   `cd backend`
+   ```
+   cd backend
+   ```
 
-2. **仮想環境を作成し、有効化します。**Bash
+3. **仮想環境を作成し、有効化します。**
 
-   `# 仮想環境を作成
+   ### 仮想環境を作成
+   ```
    python -m venv venv
+   ```
 
-   # 仮想環境を有効化
+   ### 仮想環境を有効化
 
-   # Mac/Linux
-
+   ### Mac/Linux
+   ```
    source venv/bin/activate
+   ```
 
-   # Windows
+   ### Windows
+   ```
+   .\venv\Scripts\activate
+   ```
 
-   .\venv\Scripts\activate`
+  **必要なライブラリをインストールします。**
+  **もし `requirements.txt` がまだなければ、以下のコマンドで作成してください。**
 
-3. **必要なライブラリをインストールします。\***もし `requirements.txt` がまだなければ、以下のコマンドで作成してください。\*`pip freeze > requirements.txt`Bash
+   pip freeze > requirements.txt
+   ```
+   pip install -r requirements.txt
+   ```
 
-   `pip install -r requirements.txt`
-
-4. **Google Earth Engine の認証を行います。**Bash
-
-   `earthengine authenticate`
+  **Google Earth Engine の認証を行います。**
+   ```
+   earthengine authenticate
+   ```
 
    ブラウザが起動し、認証プロセスが始まります。指示に従って認証を完了してください。
 
 ### **4. フロントエンド (Next.js)**
 
-1. **`frontend`ディレクトリに移動します。**Bash
-
-   `# プロジェクトルートから移動する場合
-cd frontend`
+1. **frontendディレクトリに移動します。**
+   ```
+   プロジェクトルートから移動する場合
+   cd frontend`
+   ```
 
 2. **必要なライブラリをインストールします。**Bash
+   ```
+   npm install
+   ```
 
-   `npm install`
-
-3. **環境変数を設定します。**`frontend`ディレクトリの直下に `.env.local` という名前のファイルを作成し、Cesium Ion のアクセストークンを記述します。Code snippet
-
-   `NEXT_PUBLIC_CESIUM_ION_TOKEN="ここにあなたのCesium Ionトークンを貼り付け"`
+4. **環境変数を設定します。**`frontend`ディレクトリの直下に `.env.local` という名前のファイルを作成し、Cesium Ion のアクセストークンを記述します。
+   ```
+   NEXT_PUBLIC_CESIUM_ION_TOKEN="ここにあなたのCesium Ionトークンを貼り付け"
+   ```
 
    - トークンは [Cesium Ion 公式サイト](https://ion.cesium.com/) で無料アカウントを作成すると取得できます。
 
 ---
 
-## ▶️ 実行方法
+## 実行方法
 
 アプリケーションを起動するには、**2 つのターミナル**が必要です。
 
-1. **ターミナル 1: バックエンドサーバーの起動**Bash
-
-   `cd backend
+1. **ターミナル 1: バックエンドサーバーの起動**
+   ```
+   cd backend
+   ```
 
    ### 仮想環境を有効化
-
+   ```
    source venv/bin/activate # or .\venv\Scripts\activate
+   ```
 
    ### サーバーを起動
-
-   uvicorn main:app --reload`
+   ```
+   uvicorn main:app --reload
+   ```
 
    サーバーが `http://127.0.0.1:8000` で起動します。
 
-2. **ターミナル 2: フロントエンドサーバーの起動**Bash
-
-   `cd frontend
-
+3. **ターミナル 2: フロントエンドサーバーの起動**
+   ```
+   cd frontend
+   ```
    ### サーバーを起動
-
-   npm run dev`
+   ```
+   npm run dev
+   ```
 
    アプリケーションが `http://localhost:3000` で起動します。
 
