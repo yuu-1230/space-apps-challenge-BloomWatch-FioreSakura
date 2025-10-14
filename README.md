@@ -1,6 +1,18 @@
 # BloomScope - NASA Space Apps Challenge 2025
+## Team FioreSakura
+**このリポジトリはNASA Space Apps Challengeの開発途中のコードの一部であり、最終的に提出されたものではありません。**
+## 最終提出資料
+プレゼン資料 ： https://www.canva.com/design/DAG04XVDjz4/zWUaaKVBEHxQtUGIKsJnTA/view
 
-これは、NASA Space Apps Challenge 2025 のテーマ「BloomWatch」に取り組むためのプロジェクトです。Google Earth Engine (GEE) の衛星データを活用し、地球上の植物の開花フェノロジー（生物季節）を可視化する Web アプリケーションを開発します。
+youtube ： https://youtu.be/Hb5Z6hqt9nQ
+
+デプロイリポジトリ ： https://github.com/tanabedesu/myproject/tree/main/nasa_spaceapps
+
+## 概要
+NASA Space Apps Challenge 2025 のテーマ「BloomWatch」に取り組むためのプロジェクトです。
+
+Google Earth Engine (GEE) の衛星データを活用し、地球上の植物の開花フェノロジー（生物季節）を可視化する Web アプリケーションを開発します。
+<img width="720" height="378" alt="image" src="https://github.com/user-attachments/assets/97fe6f3e-19b6-49b8-b82f-ecc55168fef2" />
 
 ## 🚀 技術スタック
 
