@@ -2,7 +2,7 @@
 ## Team FioreSakura
 **このリポジトリはNASA Space Apps Challengeの開発途中のコードの一部であり、最終的に提出されたものではありません。**
 
-**cesiumを用いて3Dマップを表示する部分まで完成しています**
+**cesiumを用いて3Dマップを表示する部分まで完成しています。**
 ## 最終提出資料
 プレゼン資料 ： https://www.canva.com/design/DAG04XVDjz4/zWUaaKVBEHxQtUGIKsJnTA/view
 
