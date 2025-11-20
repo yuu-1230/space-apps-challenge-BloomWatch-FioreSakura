@@ -1,30 +1,86 @@
-// frontend/app/page.js
-"use client"; // ブラウザで動作するコンポーネントであることを示す
+"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
+import InfoPanel from "@/components/InfoPanel";
 
 export default function Home() {
-  // バックエンドからのメッセージを保存するための状態
-  const [message, setMessage] = useState("Loading...");
+  const [predictionData, setPredictionData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // このコンポーネントが最初に表示されたときに一度だけ実行される処理
-  useEffect(() => {
-    // バックエンドのAPI (http://127.0.0.1:8000/) にアクセス
-    fetch("http://127.0.0.1:8000/")
-      .then((response) => response.json())
-      .then((data) => {
-        // 受け取ったメッセージを状態にセットする
-        setMessage(data.message);
+  // CesiumMapコンポーネントを動的に、かつクライアントサイドでのみインポートします。
+  // これにより、サーバーサイドレンダリング時のエラーを回避します。
+  const CesiumMap = useMemo(
+    () =>
+      dynamic(() => import("@/components/CesiumMap"), {
+        ssr: false, // サーバーサイドレンダリングを無効化
+        // 地図が読み込まれるまでの間に表示するローディング画面
+        loading: () => (
+          <div
+            style={{
+              width: "100vw",
+              height: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#002B4D",
+            }}
+          >
+            <p style={{ color: "white", fontSize: "1.5rem" }}>
+              Loading Globe...
+            </p>
+          </div>
+        ),
+      }),
+    []
+  );
+
+  /**
+   * 地図がクリックされたときに呼び出される関数
+   * @param {number} latitude - クリックされた地点の緯度
+   * @param {number} longitude - クリックされた地点の経度
+   */
+  const handleMapClick = (latitude, longitude) => {
+    setIsLoading(true);
+    setPredictionData(null);
+    setError(null);
+
+    // バックエンドの予測APIにリクエストを送信
+    fetch(`http://127.0.0.1:8000/api/predict?lat=${latitude}&lon=${longitude}`)
+      .then((response) => {
+        // レスポンスが正常でない場合はエラーを投げる
+        if (!response.ok) {
+          return response.json().then((err) => {
+            throw new Error(err.detail || "Network response was not ok");
+          });
+        }
+        return response.json();
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setMessage("Failed to connect to backend.");
+      .then((data) => {
+        setPredictionData(data); // 成功したらデータをセット
+      })
+      .catch((err) => {
+        setError(err.message); // エラーが発生したらエラーメッセージをセット
+      })
+      .finally(() => {
+        setIsLoading(false); // 成功・失敗に関わらずローディングを終了
       });
-  }, []); // 空の配列は「最初の一回だけ実行」を意味する
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold">{message}</h1>
-    </main>
+    <div
+      style={{
+        position: "relative",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      {/* 地図コンポーネントをレンダリングし、クリックイベント用の関数を渡す */}
+      <CesiumMap onMapClick={handleMapClick} />
+      {/* 情報パネルコンポーネントに、表示に必要なデータと状態を渡す */}
+      <InfoPanel data={predictionData} isLoading={isLoading} error={error} />
+    </div>
   );
 }
